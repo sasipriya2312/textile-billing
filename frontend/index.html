@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sri Mahalakshmi Textile - Billing</title>
+<style>
+  :root{
+    --ink:#000;
+    --line:#000;
+    --paper:#fff;
+    --muted:#555;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#e9e9e9;
+    margin:0;
+    padding:20px;
+    color:var(--ink);
+  }
+  .toolbar{
+    max-width:760px;
+    margin:0 auto 14px auto;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .toolbar button{
+    padding:10px 16px;
+    font-size:14px;
+    border:1px solid #333;
+    background:#222;
+    color:#fff;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .toolbar button.secondary{
+    background:#fff;
+    color:#222;
+  }
+  .toolbar button:hover{opacity:.85;}
+
+  .invoice{
+    max-width:760px;
+    margin:0 auto;
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    padding:0;
+  }
+  .titlebar{
+    text-align:center;
+    font-weight:bold;
+    font-size:14px;
+    border-bottom:1.5px solid var(--line);
+    padding:4px 0;
+    letter-spacing:1px;
+  }
+  .header{
+    text-align:center;
+    padding:8px 10px 10px;
+    border-bottom:1.5px solid var(--line);
+    position:relative;
+  }
+  .header h1{
+    margin:2px 0 0 0;
+    font-size:30px;
+    letter-spacing:1px;
+  }
+  .header .sub{
+    font-size:13px;
+    font-weight:bold;
+    margin:2px 0;
+  }
+  .header .addr{
+    font-size:12px;
+    margin:2px 0;
+  }
+  .header .email{
+    font-size:12px;
+    font-weight:bold;
+    margin:2px 0;
+  }
+  .header .phone{
+    font-size:18px;
+    font-weight:bold;
+    margin:4px 0 2px;
+  }
+  .header .gstin{
+    font-size:12px;
+    font-weight:bold;
+  }
+  .header{
+    text-align:center;
+    padding:8px 10px 10px;
+    border-bottom:1.5px solid var(--line);
+    position:relative;
+}
+
+.header-left{
+    position:absolute;
+    left:10px;
+    top:5px;
+    width:140px;
+    height:140px;
+}
+
+.header-left img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+
+
+  .meta-grid{
+    display:grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    border-bottom:1.5px solid var(--line);
+  }
+  .billto{
+    border-right:1px solid var(--line);
+    padding:6px 8px;
+    min-height:140px;
+    font-size:12px;
+  }
+  .billto .label{
+    text-decoration:underline;
+    font-weight:bold;
+    margin-bottom:4px;
+    display:block;
+  }
+  .billto textarea{
+    width:100%;
+    height:80px;
+    border:none;
+    resize:none;
+    font-size:13px;
+    font-family:inherit;
+    outline:none;
+  }
+  .gstin-row{
+    border-top:1px solid var(--line);
+    padding:4px 8px;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .gstin-row input{
+    border:none;
+    border-bottom:1px dotted #999;
+    flex:1;
+    font-size:12px;
+    outline:none;
+  }
+  .meta-fields{
+    border-right:1px solid var(--line);
+  }
+  .meta-fields .row, .meta-fields2 .row{
+    display:flex;
+    border-bottom:1px solid var(--line);
+    font-size:11px;
+    padding:3px 6px;
+    align-items:center;
+    min-height:30px;
+  }
+  .meta-fields .row:last-child, .meta-fields2 .row:last-child{
+    border-bottom:none;
+  }
+  .meta-fields .row span.lbl, .meta-fields2 .row span.lbl{
+    width:62%;
+    line-height:1.1;
+  }
+  .meta-fields input, .meta-fields2 input{
+    flex:1;
+    border:none;
+    border-bottom:1px dotted #999;
+    font-size:11px;
+    outline:none;
+    min-width:0;
+  }
+
+  table.items{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+  }
+  table.items th, table.items td{
+    border:1px solid var(--line);
+    padding:4px 6px;
+    text-align:center;
+  }
+  table.items th{
+    font-size:12px;
+    font-weight:bold;
+  }
+  table.items td.desc{
+    text-align:left;
+  }
+  table.items input{
+    width:100%;
+    border:none;
+    outline:none;
+    font-size:12px;
+    text-align:center;
+    font-family:inherit;
+  }
+  table.items td.desc input{text-align:left;}
+  table.items tr.empty-row td{ height:26px; }
+
+  .row-controls{
+    display:flex;
+    gap:8px;
+    padding:6px;
+    border-top:none;
+    border-left:1px solid var(--line);
+    border-right:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    font-size:12px;
+  }
+  .row-controls button{
+    font-size:12px;
+    padding:4px 10px;
+    cursor:pointer;
+  }
+
+  .bottom-grid{
+    display:grid;
+    grid-template-columns: 1.4fr 1fr;
+    border-top:1px solid var(--line);
+  }
+  .amount-words{
+    border-right:1px solid var(--line);
+    padding:8px;
+    font-size:12px;
+  }
+  .amount-words .line{
+    border-bottom:1px dotted #777;
+    min-height:18px;
+    margin-bottom:6px;
+    display:flex;
+    align-items:flex-end;
+  }
+  .amount-words textarea{
+    width:100%;
+    border:none;
+    resize:none;
+    height:54px;
+    font-size:12px;
+    outline:none;
+    font-family:inherit;
+  }
+  .eoe{
+    text-align:right;
+    font-size:10px;
+    font-style:italic;
+    margin-top:4px;
+  }
+  .totals .row{
+    display:flex;
+    border-bottom:1px solid var(--line);
+    font-size:12px;
+    min-height:26px;
+  }
+  .totals .row:last-child{border-bottom:none;}
+  .totals .row .lbl{
+    width:55%;
+    padding:4px 8px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+}
+
+.totals .row .lbl .pct{
+    width:32px;
+    margin-left:auto;
+    text-align:center;
+    border:none;
+    outline:none;
+    font-size:12px;
+    font-family:inherit;
+}
+  .totals .row .val{
+    flex:1;
+    border-left:1px solid var(--line);
+    display:flex;
+    align-items:center;
+  }
+  .totals .row .val input{
+    width:100%;
+    border:none;
+    outline:none;
+    text-align:right;
+    padding:0 8px;
+    font-size:12px;
+    font-family:inherit;
+  }
+  .totals .row.total .lbl{
+    justify-content:flex-end;
+    width:55%;
+  }
+  .totals .row.total{
+    font-weight:bold;
+    font-size:13px;
+  }
+  .totals .row .pct{
+    width:34px;
+    border:none;
+    outline:none;
+    text-align:right;
+    font-size:12px;
+    font-family:inherit;
+  }
+
+  .footer{
+    display:grid;
+    grid-template-columns: 1.4fr 1fr;
+    border-top:1.5px solid var(--line);
+    font-size:11.5px;
+  }
+  .footer .bankinfo{
+    padding:8px;
+    border-right:1px solid var(--line);
+    line-height:1.5;
+  }
+  .footer .bankinfo .frow{
+    display:flex;
+  }
+  .footer .bankinfo .flbl{ width:110px; }
+  .footer .bankinfo input{
+    flex:1;
+    border:none;
+    outline:none;
+    font-size:11.5px;
+    font-family:inherit;
+  }
+  .footer .sign{
+    padding:8px;
+    text-align:right;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .footer .sign .for{
+    font-weight:bold;
+    text-align:right;
+  }
+  .footer .sign .auth{
+    text-align:right;
+    margin-top:30px;
+  }
+
+  @media print{
+    body{ background:#fff; padding:0; }
+    .toolbar{ display:none; }
+    .invoice{ border:1.5px solid #000; max-width:100%; }
+    input, textarea{
+      border:none !important;
+    }
+    .row-controls{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="saveInvoice()">💾 Save Bill</button>
+  <button onclick="window.print()">🖨️ Print Bill</button>
+  <button class="secondary" onclick="addRow()">+ Add Item Row</button>
+  <button class="secondary" onclick="clearAll()">Clear All / New Bill</button>
+  <select id="savedList" class="secondary" style="padding:8px;border-radius:6px;border:1px solid #333;" onchange="loadSelected()">
+    <option value="">-- Saved Bills --</option>
+  </select>
+  <button class="secondary" onclick="deleteSelected()">🗑 Delete Selected</button>
+  <span id="saveStatus" style="align-self:center;font-size:13px;color:#222;"></span>
+</div>
+
+<div class="invoice" id="invoice">
+
+  <div class="titlebar">TAX INVOICE</div>
+
+  <div class="header">
+    <div class="header-left">
+    <img src="mahalakshmi.png" alt="Ganesh">
+</div>
+
+    <h1>SRI MAHALAKSHMI TEXTILE</h1>
+    <div class="sub">HANDLOOM SAREES MANUFACTURER</div>
+    <div class="addr">20TH WARD, THARAMANGALAM(PO), SALEM - 636502.</div>
+    <div class="email">Email : srimahalakshmitextilegst@gmail.com</div>
+    <div class="phone">Ph: 9629295568</div>
+    <div class="gstin">GSTIN : 33CKGPK7014N1Z0</div>
+  </div>
+
+  <div class="meta-grid">
+    <div class="billto">
+      <span class="label">Billing &amp; Delivery to</span>
+      <textarea data-field="billTo" placeholder="Customer name, address..."></textarea>
+      <div class="gstin-row">
+        GSTIN : <input data-field="billGstin" type="text">
+      </div>
+    </div>
+
+    <div class="meta-fields">
+      <div class="row"><span class="lbl">Invoice No. :</span><input data-field="invoiceNo" type="text"></div>
+      <div class="row"><span class="lbl">Delivery Note &amp; Date :</span><input data-field="deliveryNote" type="text"></div>
+      <div class="row"><span class="lbl">Reference No. &amp; Date :</span><input data-field="referenceNo" type="text"></div>
+      <div class="row"><span class="lbl">Dispatch Doc No. :</span><input data-field="dispatchDoc" type="text"></div>
+      <div class="row"><span class="lbl">Dispatched Through :</span><input data-field="dispatchedThrough" type="text"></div>
+      <div class="row"><span class="lbl">Other References :</span><input data-field="otherRef" type="text"></div>
+    </div>
+
+    <div class="meta-fields2">
+      <div class="row"><span class="lbl">Dated :</span><input data-field="dated" type="text"></div>
+      <div class="row"><span class="lbl">Eway Bill No. :</span><input data-field="ewayBill" type="text"></div>
+      <div class="row"><span class="lbl">Buyer's Order No. &amp; Date :</span><input data-field="buyerOrder" type="text"></div>
+      <div class="row"><span class="lbl">Bill of Lading / LR-RR No :</span><input data-field="billLading" type="text"></div>
+      <div class="row"><span class="lbl">Destination :</span><input data-field="destination" type="text"></div>
+      <div class="row"><span class="lbl">Vehicle No :</span><input data-field="vehicleNo" type="text"></div>
+    </div>
+  </div>
+
+  <table class="items" id="itemsTable">
+    <thead>
+      <tr>
+        <th style="width:6%">S.No.</th>
+        <th style="width:34%">Description</th>
+        <th style="width:14%">HSN Code</th>
+        <th style="width:10%">Qty</th>
+        <th style="width:15%">Rate</th>
+        <th style="width:21%">Amount</th>
+      </tr>
+    </thead>
+    <tbody id="itemsBody">
+      <!-- rows injected by JS -->
+    </tbody>
+  </table>
+  <div class="row-controls">
+    <button onclick="addRow()">+ Add Row</button>
+    <button onclick="removeRow()">– Remove Last Row</button>
+    <button onclick="calcAmount()">Recalculate Amounts &amp; Total</button>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="amount-words">
+      Amount (in words)
+      <textarea id="amountWords" data-field="amountWords" placeholder="Rupees ........... only"></textarea>
+      <div class="eoe">E. &amp; O.E.</div>
+    </div>
+    <div class="totals">
+      <div class="row"><span class="lbl">TAXABLE VALUE</span><span class="val"><input id="taxable" data-field="taxable" type="text" oninput="calcTotal()"></span></div>
+      <div class="row"><span class="lbl">CGST <input class="pct" id="cgstPct" data-field="cgstPct" type="text" value="0" oninput="calcTotal()">%</span><span class="val"><input id="cgstVal" data-field="cgstVal" type="text" oninput="calcTotal()"></span></div>
+      <div class="row"><span class="lbl">SGST <input class="pct" id="sgstPct" data-field="sgstPct" type="text" value="0" oninput="calcTotal()">%</span><span class="val"><input id="sgstVal" data-field="sgstVal" type="text" oninput="calcTotal()"></span></div>
+      <div class="row"><span class="lbl">IGST <input class="pct" id="igstPct" data-field="igstPct" type="text" value="0" oninput="calcTotal()">%</span><span class="val"><input id="igstVal" data-field="igstVal" type="text" oninput="calcTotal()"></span></div>
+      <div class="row"><span class="lbl">Roundoff</span><span class="val"><input id="roundoff" data-field="roundoff" type="text" oninput="calcTotal()"></span></div>
+      <div class="row total"><span class="lbl">TOTAL</span><span class="val"><input id="grandTotal" data-field="grandTotal" type="text" readonly></span></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="bankinfo">
+      <div class="frow"><span class="flbl">Our Name</span> : <input data-field="ourName" value="Sri Mahalakshmi Textile"></div>
+      <div class="frow"><span class="flbl">Our Bank</span> : <input data-field="ourBank" value="Canara Bank"></div>
+      <div class="frow"><span class="flbl">Branch</span> : <input data-field="branch" value="Tharamangalam"></div>
+      <div class="frow"><span class="flbl">Account No.</span> : <input data-field="accountNo" value="120034853083"></div>
+      <div class="frow"><span class="flbl">IFSC Code</span> : <input data-field="ifsc" value="CNRB0007681"></div>
+      <div class="frow"><span class="flbl">Company PAN</span> : <input data-field="pan" value=""></div>
+    </div>
+    <div class="sign">
+      <div class="for">For SRI MAHALAKSHMI TEXTILE</div>
+      <div class="auth">Authorised Signatory</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function makeRow(n, data){
+  const tr = document.createElement('tr');
+  const d = data || {};
+  tr.innerHTML = `
+    <td><input type="text" value="${d.sno!==undefined?d.sno:n}"></td>
+    <td class="desc"><input type="text" value="${d.desc||''}"></td>
+    <td><input type="text" value="${d.hsn||''}"></td>
+    <td><input type="text" class="qty" value="${d.qty||''}" oninput="calcAmount()"></td>
+    <td><input type="text" class="rate" value="${d.rate||''}" oninput="calcAmount()"></td>
+    <td><input type="text" class="amount" value="${d.amount||''}" readonly></td>
+  `;
+  return tr;
+}
+
+function addRow(){
+  const body = document.getElementById('itemsBody');
+  const n = body.children.length + 1;
+  body.appendChild(makeRow(n));
+}
+
+function removeRow(){
+  const body = document.getElementById('itemsBody');
+  if(body.children.length > 1){
+    body.removeChild(body.lastElementChild);
+  }
+  calcAmount();
+}
+
+function calcAmount(){
+  const rows = document.querySelectorAll('#itemsBody tr');
+  let sum = 0;
+  rows.forEach(r=>{
+    const qty = parseFloat(r.querySelector('.qty').value) || 0;
+    const rate = parseFloat(r.querySelector('.rate').value) || 0;
+    const amt = qty * rate;
+    r.querySelector('.amount').value = amt ? amt.toFixed(2) : '';
+    sum += amt;
+  });
+  document.getElementById('taxable').value = sum ? sum.toFixed(2) : '';
+  calcTotal();
+}
+
+function calcTotal(){
+  const taxable = parseFloat(document.getElementById('taxable').value) || 0;
+  const cgstPct = parseFloat(document.getElementById('cgstPct').value) || 0;
+  const sgstPct = parseFloat(document.getElementById('sgstPct').value) || 0;
+  const igstPct = parseFloat(document.getElementById('igstPct').value) || 0;
+
+  const cgstVal = taxable * cgstPct / 100;
+  const sgstVal = taxable * sgstPct / 100;
+  const igstVal = taxable * igstPct / 100;
+
+  document.getElementById('cgstVal').value = cgstVal ? cgstVal.toFixed(2) : '';
+  document.getElementById('sgstVal').value = sgstVal ? sgstVal.toFixed(2) : '';
+  document.getElementById('igstVal').value = igstVal ? igstVal.toFixed(2) : '';
+
+  const roundoff = parseFloat(document.getElementById('roundoff').value) || 0;
+  const total = taxable + cgstVal + sgstVal + igstVal + roundoff;
+  document.getElementById('grandTotal').value = total ? total.toFixed(2) : '';
+}
+
+function clearAll(){
+  document.querySelectorAll('.invoice input[data-field]').forEach(i=>{ if(!i.readOnly) i.value=''; });
+  document.querySelectorAll('.invoice textarea[data-field]').forEach(t=> t.value='');
+  document.getElementById('cgstPct').value='0';
+  document.getElementById('sgstPct').value='0';
+  document.getElementById('igstPct').value='0';
+  const body = document.getElementById('itemsBody');
+  body.innerHTML = '';
+  for(let i=1;i<=8;i++) body.appendChild(makeRow(i));
+  document.getElementById('grandTotal').value = '';
+  document.getElementById('savedList').value = '';
+  setStatus('New bill started.');
+}
+
+function setStatus(msg){
+  const el = document.getElementById('saveStatus');
+  el.textContent = msg;
+  setTimeout(()=>{ if(el.textContent===msg) el.textContent=''; }, 3000);
+}
+
+function collectData(){
+  const data = {};
+  document.querySelectorAll('.invoice [data-field]').forEach(el=>{
+    data[el.dataset.field] = el.value;
+  });
+  const items = [];
+  document.querySelectorAll('#itemsBody tr').forEach(r=>{
+    const inputs = r.querySelectorAll('input');
+    items.push({
+      sno: inputs[0].value,
+      desc: inputs[1].value,
+      hsn: inputs[2].value,
+      qty: inputs[3].value,
+      rate: inputs[4].value,
+      amount: inputs[5].value
+    });
+  });
+  data.items = items;
+  return data;
+}
+
+function applyData(data){
+  document.querySelectorAll('.invoice [data-field]').forEach(el=>{
+    if(data.hasOwnProperty(el.dataset.field)) el.value = data[el.dataset.field];
+  });
+  const body = document.getElementById('itemsBody');
+  body.innerHTML = '';
+  (data.items || []).forEach((it, idx)=> body.appendChild(makeRow(idx+1, it)));
+  if(!data.items || data.items.length===0){
+    for(let i=1;i<=8;i++) body.appendChild(makeRow(i));
+  }
+}
+async function saveInvoice() {
+
+    try {
+
+        const data = collectData();
+
+        const invoiceNo = (data.invoiceNo || "").trim();
+
+        if (!invoiceNo) {
+            alert("Invoice No fill pannunga.");
+            return;
+        }
+
+        const response = await fetch("http://localhost:3000/invoices", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(data)
+
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+
+            setStatus("Bill Saved Successfully");
+
+            refreshList();
+
+        } else {
+
+            alert(result.message || "Save Failed");
+
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Server Connection Failed");
+
+    }
+
+}
+async function refreshList() {
+
+    const sel = document.getElementById("savedList");
+
+    sel.innerHTML = '<option value="">-- Saved Bills --</option>';
+
+    try {
+
+        const response = await fetch("http://localhost:3000/invoices");
+
+        const invoices = await response.json();
+
+        invoices.forEach(inv => {
+
+            const option = document.createElement("option");
+
+            option.value = inv.invoice_no;
+
+            option.textContent = inv.invoice_no;
+
+            sel.appendChild(option);
+
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+
+}
+async function loadSelected() {
+
+    const invoiceNo = document.getElementById("savedList").value;
+
+    if (!invoiceNo) return;
+
+    try {
+
+        const response = await fetch("http://localhost:3000/invoices/" + invoiceNo);
+
+        const data = await response.json();
+
+        applyData(data);
+
+        calcAmount();
+
+        setStatus("Bill Loaded");
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Load Failed");
+
+    }
+
+}
+async function deleteSelected() {
+
+    const invoiceNo = document.getElementById("savedList").value;
+
+    if (!invoiceNo) {
+        alert("Select an invoice.");
+        return;
+    }
+
+    if (!confirm("Delete this invoice?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch("http://localhost:3000/invoices/" + invoiceNo, {
+
+            method: "DELETE"
+
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+
+            refreshList();
+
+            clearAll();
+
+            setStatus("Invoice Deleted Successfully");
+
+        } else {
+
+            alert(result.message || "Delete Failed");
+
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Server Connection Failed");
+
+    }
+
+}
+
+// init
+for(let i=1;i<=8;i++) document.getElementById('itemsBody').appendChild(makeRow(i));
+refreshList();
+</script>
+
+</body>
+</html>
